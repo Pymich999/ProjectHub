@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% load static %}  <!-- Load the static library here -->
+
+{% block content %}
+<h2>Search for Books</h2>
+
+<form method="GET" action="{% url 'search' %}">
+    <input type="text" name="q" placeholder="Enter book title or author" value="{{ query }}">
+    <button type="submit">Search</button>
+</form>
+{% if error_message %}
+  <p style="color:red;"> {{error_message}} </p>
+{% endif %}
+
+{% if books %}
+    <h3>Search Results</h3>
+    <ul>
+        {% for book in books %}
+            <li>
+                <strong>{{ book.title }}</strong> by {{ book.authors }} <br>
+                Published: {{ book.published_date }} <br>
+
+                <!-- Display book cover if available, fallback to a placeholder if not -->
+                {% if book.thumbnail %}
+                  <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover">
+                {% else %}
+                  <img src="{% static 'images/placeholder.jpg' %}" alt="No cover available">
+                {% endif %}
+        
+                <p>{{ book.description }}</p>  <!-- Fixed the missing closing tag here -->
+
+                <form method="POST" action="{% url 'search' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name= "google_id" value="{{ book.google_id}}">
+                  <input type="hidden" name= "title" value="{{ book.title}}">
+                  <input type="hidden" name= "authors" value="{{ book.authors }}">
+                  <input type="hidden" name= "published_date" value="{{ book.published_date}}">
+                  <input type="hidden" name= "description" value="{{book.description}}">
+                  <input type="hidden" name= "thumbnail" value="{{book.thumbnail}}">
+                  <button type="submit">Add To My Catalogue</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No books found. Try searching for something else.</p>
+{% endif %}
+{% endblock %}

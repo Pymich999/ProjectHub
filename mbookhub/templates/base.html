@@ -1,0 +1,34 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BookHub{% endblock %}</title>
+</head>
+<body>
+    <!-- Common Navigation Bar -->
+    <header>
+        <h1>BookHub</h1>
+        <nav>
+            <a href="{% url 'book_list' %}">Home</a>
+            <a href="{% url 'add' %}">Add Book</a>
+            <a href="{% url 'search'%}">Search A Book<a/>
+            <a href="{% url 'profile' %}">My Profile</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+    </header>
+
+    <!-- Dynamic Content Will Be Inserted Here -->
+    <div class="container">
+        {% block content %}
+        <!-- This is where page-specific content will go -->
+        {% endblock %}
+    </div>
+
+    <!-- Common Footer -->
+    <footer>
+        <p>&copy; 2024 BookHub. All rights reserved.</p>
+    </footer>
+</body>
+</html>

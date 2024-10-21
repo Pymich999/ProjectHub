@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+       <h1> Book List </h1>
+        <u1>
+
+           {% for book in books %}
+              <li>
+                <h3>{{ book.title }} by {{book.author}}</h3>
+                {% if book.cover_image %}
+                  <img src="{{ book.cover_image.url }}" alt="{{book.title}}" width="250">
+                {% endif %}
+                <p>{{book.description}}</p>
+              </li>
+              
+           {% endfor %}
+
+        </u1>
+{% endblock %}
