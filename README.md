@@ -1,0 +1,1 @@
+A BookHub webapp created with django python framework, it includes a user authentication signup page, profile page, home page, search page integrated with Google Books API and a add to catalogue option. 
