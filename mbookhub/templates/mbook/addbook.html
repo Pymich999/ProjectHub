@@ -38,7 +38,8 @@
                   <input type="hidden" name= "published_date" value="{{ book.published_date}}">
                   <input type="hidden" name= "description" value="{{book.description}}">
                   <input type="hidden" name= "thumbnail" value="{{book.thumbnail}}">
-                  <button type="submit">Add To My Catalogue</button>
+                  <button type="submit" name="action" value="add_to_catalogue">Add To My Catalogue</button>
+                  <button type="submit" name="action" value="post_to_booklist">Post</button>
                 </form>
             </li>
         {% endfor %}

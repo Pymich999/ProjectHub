@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Post About "{{ book.title }}"</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Render the form fields properly -->
+        <button type="submit">Post</button>
+    </form>
+
+    <a href="{{ book.infolink }}">Read more about the book</a> <!-- Link to book details if needed -->
+{% endblock %}
+

@@ -1,20 +1,39 @@
-{% extends "base.html" %}
+
+{% extends 'base.html' %}
+
+{% load static %} 
 
 {% block content %}
+<h2>BookList</h2>
 
-       <h1> Book List </h1>
-        <u1>
+{% for book in books %}
+    <div class="post">
+        <strong>{{ user.username }} posted about "{{ book.title }}"</strong>
+        <p>{{ post.caption }}</p>
 
-           {% for book in books %}
-              <li>
-                <h3>{{ book.title }} by {{book.author}}</h3>
-                {% if book.cover_image %}
-                  <img src="{{ book.cover_image.url }}" alt="{{book.title}}" width="250">
-                {% endif %}
-                <p>{{book.description}}</p>
-              </li>
-              
-           {% endfor %}
+        <img src="{{ book.thumbnail }}" alt="{{ book.book.title }} cover">
+        <p>Authors: {{ book.authors }}</p>
 
-        </u1>
+
+        <!-- Likes Section -->
+        <div>
+          <button class="like-btn" data-post-id="{{ post.id }}" onclick="likePost('{{ post.id }}')">
+
+                Like ({{ likes.count }})
+            </button>
+        </div>
+
+        <!-- Comments Section (existing) -->
+        <div class="comments">
+            <h4>Comments:</h4>
+            {% for comment in book.comments.all %}
+                <p><strong>{{ user.username }}:</strong> {{ content }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+
+<!-- Include a JavaScript file -->
+<script src="{% static 'js/like.js' %}"></script>
+
 {% endblock %}

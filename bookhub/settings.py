@@ -131,3 +131,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 GOOGLE_BOOKS_API_KEY = 'AIzaSyDSiDq-lSvE13kL4dI7Yz42tt6wmlA04-c'
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+STATIC_URL = '/static/'  
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'mbookhub', 'static'),
+]

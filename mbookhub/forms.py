@@ -1,12 +1,7 @@
 from django import forms
-from .models import Book, Profile
+from .models import Profile, Post
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User 
-
-class Bookform(forms.ModelForm):
-    class Meta:
-        model = Book
-        fields = ['title', 'author', 'genre', 'description', 'isbn', 'rating', 'cover_image']
 
 
 class SignupForm(UserCreationForm):
@@ -24,3 +19,8 @@ class ProfileUpdateForm(forms.ModelForm):
 
 class BookSearchForm(forms.Form):
     query = forms.CharField(max_length=255, label='Search For A Book')
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['book', 'caption', 'likes']
