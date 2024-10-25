@@ -1,6 +1,6 @@
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpRequest,HttpResponseRedirect, JsonResponse
+from django.http import HttpRequest,HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from .models import Book, Profile, Books, Post, Comment, Rating
 from .forms import SignupForm, ProfileUpdateForm, PostForm
 from django.contrib.auth import authenticate,login,logout
@@ -14,13 +14,9 @@ from django.conf import settings
 from requests.exceptions import RequestException
 # Create your views here.
 
-
 def book_list(request):
-    # Fetch books and prefetch related posts for efficiency
-    books = Book.objects.prefetch_related('post_set').all()  # `post_set` is the reverse relation for the ForeignKey
+    books = Book.objects.prefetch_related('post_set__comments').all()
     return render(request, 'mbook/book_list.html', {'books': books})
-
-
 
 def signup(request):
     if request.method == 'POST':
@@ -140,56 +136,56 @@ def addbook(request):
     return render(request, 'mbook/addbook.html', {'books': books, 'query': query, 'error_message': error_message})
 
 
-
 @login_required
 def create_post(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
     if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)  # Don't save to the database yet
-            post.book = book
-            post.user = request.user
-            post.save()  # Now save it with book and user assigned
-            return redirect('book_list')  # Redirect to the book's detail page or where you'd like
-    else:
-        form = PostForm()
+        caption = request.POST.get('caption')
+        if caption:
+            # Create the post with just the caption
+            post = Post.objects.create(book=book, user=request.user, caption=caption)
+            return redirect('book_list')  # Redirect to the book list or home page
 
-    return render(request, 'mbook/create_post.html', {'form': form, 'book': book})
+    return render(request, 'mbook/create_post.html', {'book': book})
 
 
 @login_required
-def like_post(request,post_id):
-    post = Post.objects.get(id=post_id)
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
-    if post.likes.filter(id=request.user.id).exists():
-        post.likes.remove(request.user) #if liked, unlike
+    # Toggle like or unlike
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)  # Unlike the post
     else:
-        post.likes.add(request.user)
+        post.likes.add(request.user)  # Like the post
 
-    return JsonResponse(
-        {
-            'success': True,
-            'likes_count': post.likes.count()
-        }
-    )
+    # Return the updated like count as a JSON response
+    return JsonResponse({
+        'success': True,
+        'likes_count': post.likes.count()  # Send back the updated like count
+    })
 
 
 @login_required
 def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)  # Get the post that the comment is about
+    post = get_object_or_404(Post, id=post_id)
 
     if request.method == 'POST':
-        comment_content = request.POST.get('comment_content')
-
-        if comment_content:
+        content = request.POST.get('content')
+        if content:
             # Create and save the comment
-            Comment.objects.create(
-                post=post,
-                user=request.user,  # Link the comment to the logged-in user
-                content=comment_content
-            )
-        
-        # Redirect back to the booklist homepage after adding the comment
-        return redirect('booklist_home')
+            Comment.objects.create(post=post, user=request.user, content=content)
+    
+    return redirect('book_list')  # Redirect to the book list page
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Ensure only the post owner can delete the post
+    if post.user != request.user:
+        return HttpResponseForbidden("You are not allowed to delete this post.")
+
+    post.delete()  # Delete the post
+    return redirect('book_list')  # Redirect to the book list page after deletion
