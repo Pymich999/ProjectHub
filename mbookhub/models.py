@@ -43,6 +43,7 @@ class Post(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     caption = models.TextField(null=True, blank=True) #users thoughts about a book
     created_at = models.DateTimeField(auto_now_add=True)
+    thumbnail = models.URLField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name="post_likes", blank=True) #Users like on a book
 
     def __str__(self):

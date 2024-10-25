@@ -9,13 +9,15 @@
     <div class="book-item">
         <h3>{{ book.title }}</h3>
         <p>Authors: {{ book.authors }}</p>
-        <img src="{{ book.thumbnail }}" alt="{{ book.title }} cover">
-        
+         
         <!-- Loop through related posts for each book -->
         {% for post in book.post_set.all %}
             <div class="post">
                 <strong>{{ post.user.username }} posted about "{{ post.book.title }}"</strong>
                 <p>{{ post.caption }}</p>
+
+                <!-- Display post's unique thumbnail -->
+                <img src="{{ post.thumbnail }}" alt="{{ post.book.title }} cover">
 
                  <!-- Delete Button (visible only to the post owner) -->
                 {% if post.user == request.user %}
@@ -56,4 +58,3 @@
 {% endfor %}
 <script src="{% static 'js/like.js' %}"></script>
 {% endblock %}
-

@@ -12,10 +12,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.conf import settings
 from requests.exceptions import RequestException
+from django.db.models import Count
 # Create your views here.
 
 def book_list(request):
-    books = Book.objects.prefetch_related('post_set__comments').all()
+    books = Book.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).prefetch_related('post_set__comments')
     return render(request, 'mbook/book_list.html', {'books': books})
 
 def signup(request):
@@ -143,9 +144,14 @@ def create_post(request, book_id):
     if request.method == 'POST':
         caption = request.POST.get('caption')
         if caption:
-            # Create the post with just the caption
-            post = Post.objects.create(book=book, user=request.user, caption=caption)
-            return redirect('book_list')  # Redirect to the book list or home page
+            # Use the book's thumbnail for the post's thumbnail
+            post = Post.objects.create(
+                book=book, 
+                user=request.user, 
+                caption=caption,
+                thumbnail=book.thumbnail  # Set the post thumbnail from the book's thumbnail
+            )
+            return redirect('book_list')  # Redirect to the book list or homepage
 
     return render(request, 'mbook/create_post.html', {'book': book})
 
