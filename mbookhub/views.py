@@ -1,4 +1,5 @@
 import requests
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpRequest,HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from .models import Book, Profile, Books, Post, Comment, Rating
@@ -195,3 +196,24 @@ def delete_post(request, post_id):
 
     post.delete()  # Delete the post
     return redirect('book_list')  # Redirect to the book list page after deletion
+
+@login_required
+def rate_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    # Ensure we are handling a JSON POST request
+    try:
+        data = json.loads(request.body)  # Load JSON data from request body
+        rating_value = data.get('rating')
+        
+        if rating_value and 1 <= int(rating_value) <= 5:  # Validate rating value
+            rating, created = Rating.objects.update_or_create(
+                book=book,
+                user=request.user,
+                defaults={'rating': int(rating_value)}
+            )
+            return JsonResponse({'success': True, 'new_rating': rating.rating})
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid rating value'}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid data format'}, status=400)

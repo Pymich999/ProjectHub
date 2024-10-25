@@ -1,6 +1,7 @@
-
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}  <!-- Load custom filters here -->
+
 {% block content %}
 <h2>BookList</h2>
 
@@ -9,7 +10,30 @@
     <div class="book-item">
         <h3>{{ book.title }}</h3>
         <p>Authors: {{ book.authors }}</p>
-         
+        
+        <!-- Display average rating for the book -->
+        <p>Average Rating: 
+            {% if book.ratings.count > 0 %}
+                {{ book.ratings.all|average:"rating" }} / 5
+            {% else %}
+                No ratings yet.
+            {% endif %}
+        </p>
+
+        <!-- Rating Form -->
+        <form method="POST" action="{% url 'rate_book' book.id %}" class="rating-form">
+            {% csrf_token %}
+            <label for="rating">Rate this book:</label>
+            <select name="rating" id="rating-{{ book.id }}">
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+            <button type="button" onclick="submitRating('{{ book.id }}')">Submit Rating</button>
+        </form>
+
         <!-- Loop through related posts for each book -->
         {% for post in book.post_set.all %}
             <div class="post">
@@ -19,12 +43,12 @@
                 <!-- Display post's unique thumbnail -->
                 <img src="{{ post.thumbnail }}" alt="{{ post.book.title }} cover">
 
-                 <!-- Delete Button (visible only to the post owner) -->
+                <!-- Delete Button (visible only to the post owner) -->
                 {% if post.user == request.user %}
-                  <form method="POST" action="{% url 'delete_post' post.id %}">
-                     {% csrf_token %}
-                     <button type="submit">Delete Post</button>
-                  </form>
+                    <form method="POST" action="{% url 'delete_post' post.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Delete Post</button>
+                    </form>
                 {% endif %}
 
                 <!-- Like Button (AJAX enabled) -->
@@ -56,5 +80,7 @@
         {% endfor %}
     </div>
 {% endfor %}
+
 <script src="{% static 'js/like.js' %}"></script>
+<script src="{% static 'js/rating.js' %}"></script>
 {% endblock %}

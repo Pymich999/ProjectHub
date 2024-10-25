@@ -61,11 +61,14 @@ class Comment(models.Model):
     
 
 class Rating(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="ratings")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)]) #rating between 1 and 5
+    rating = models.IntegerField()  # Rating value, e.g., 1 to 5
+
+    class Meta:
+        unique_together = ('book', 'user')  # Ensure each user can rate a book only once
 
     def __str__(self):
-        return f"{self.user.username} rated {self.book.title} {self.rating}/5"
+        return f"{self.user.username} rated {self.book.title} with {self.rating} stars"
     
     

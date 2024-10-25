@@ -16,5 +16,6 @@ urlpatterns = [
     path('post/<int:post_id>/like/', views.like_post, name='like_post'),
     path('post/<int:post_id>/comment/', views.add_comment, name='add_comment'),
     path('create-post/<int:book_id>/', views.create_post, name='create_post'),
-    path('post/<int:post_id>/delete/', views.delete_post, name='delete_post'),  # URL for deleting a post
+    path('post/<int:post_id>/delete/', views.delete_post, name='delete_post'),# URL for deleting a post
+    path('rate-book/<int:book_id>/', views.rate_book, name='rate_book'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
